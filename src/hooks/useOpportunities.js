@@ -1,30 +1,34 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { INTERNSHIPS, JOBS, SCHOLARSHIPS } from '../data/opportunitiesData';
 
+const STORAGE_KEY = 'global-scholars-hub-saved-items';
+
 export function useOpportunities() {
   const [activeTab, setActiveTab] = useState('All opportunities');
   const [query, setQuery] = useState('');
   const [activeFilterTag, setActiveFilterTag] = useState('');
+  const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [savedIds, setSavedIds] = useState(() => {
     try {
-      const stored = window.localStorage.getItem('opportuna-saved-items');
-      return stored ? JSON.parse(stored) : ['sch-1', 'job-1'];
+      const stored = window.localStorage.getItem(STORAGE_KEY);
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed : [];
     } catch {
-      return ['sch-1', 'job-1'];
+      return [];
     }
   });
 
   useEffect(() => {
     try {
-      window.localStorage.setItem('opportuna-saved-items', JSON.stringify(savedIds));
-    } catch (e) {
-      console.error('Failed to save to localStorage', e);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(savedIds));
+    } catch {
+      // Storage can be unavailable in privacy-restricted contexts; UI still works in memory.
     }
   }, [savedIds]);
 
   const toggleSave = useCallback((id) => {
     setSavedIds((current) =>
-      current.includes(id) ? current.filter((x) => x !== id) : [...current, id]
+      current.includes(id) ? current.filter((itemId) => itemId !== id) : [...current, id]
     );
   }, []);
 
@@ -33,53 +37,38 @@ export function useOpportunities() {
   const filteredItems = useMemo(() => {
     let list = allItems;
 
-    if (activeTab === 'Scholarships') {
-      list = SCHOLARSHIPS;
-    } else if (activeTab === 'Jobs') {
-      list = JOBS;
-    } else if (activeTab === 'Internships') {
-      list = INTERNSHIPS;
+    if (activeTab === 'Scholarships') list = SCHOLARSHIPS;
+    if (activeTab === 'Jobs') list = JOBS;
+    if (activeTab === 'Internships') list = INTERNSHIPS;
+
+    if (showSavedOnly) {
+      list = list.filter((item) => savedIds.includes(item.id));
     }
 
     if (activeFilterTag) {
       const tagLower = activeFilterTag.toLowerCase();
-      list = list.filter(
-        (item) => {
-          if (activeFilterTag === 'Closing soon') {
-            if (item.deadline) {
-              const daysMatch = item.deadline.match(/(\d+)/);
-              if (daysMatch && parseInt(daysMatch[1], 10) <= 21) {
-                return true;
-              }
-            }
-            return false;
-          }
-          return (
-            (item.type && item.type.toLowerCase().includes(tagLower)) ||
-            (item.tag && item.tag.toLowerCase().includes(tagLower)) ||
-            (item.location && item.location.toLowerCase().includes(tagLower)) ||
-            (item.level && item.level.toLowerCase().includes(tagLower)) ||
-            (item.deadline && item.deadline.toLowerCase().includes(tagLower))
-          );
+      list = list.filter((item) => {
+        if (activeFilterTag === 'Closing soon') {
+          const daysMatch = item.deadline?.match(/(\d+)/);
+          return Boolean(daysMatch && Number.parseInt(daysMatch[1], 10) <= 21);
         }
-      );
+        return [item.type, item.tag, item.location, item.level, item.deadline]
+          .filter(Boolean)
+          .some((value) => value.toLowerCase().includes(tagLower));
+      });
     }
 
     if (query.trim()) {
-      const q = query.toLowerCase().trim();
-      list = list.filter(
-        (item) =>
-          (item.name && item.name.toLowerCase().includes(q)) ||
-          (item.school && item.school.toLowerCase().includes(q)) ||
-          (item.company && item.company.toLowerCase().includes(q)) ||
-          (item.country && item.country.toLowerCase().includes(q)) ||
-          (item.location && item.location.toLowerCase().includes(q)) ||
-          (item.description && item.description.toLowerCase().includes(q))
+      const normalizedQuery = query.toLowerCase().trim();
+      list = list.filter((item) =>
+        [item.name, item.school, item.company, item.country, item.location, item.description]
+          .filter(Boolean)
+          .some((value) => value.toLowerCase().includes(normalizedQuery))
       );
     }
 
     return list;
-  }, [allItems, activeTab, activeFilterTag, query]);
+  }, [activeTab, activeFilterTag, allItems, query, savedIds, showSavedOnly]);
 
   return {
     activeTab,
@@ -88,9 +77,11 @@ export function useOpportunities() {
     setQuery,
     activeFilterTag,
     setActiveFilterTag,
+    showSavedOnly,
+    setShowSavedOnly,
     savedIds,
     toggleSave,
     filteredItems,
-    totalCount: filteredItems.length
+    totalCount: filteredItems.length,
   };
 }

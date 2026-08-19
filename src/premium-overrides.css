@@ -1,0 +1,32 @@
+/* Global Scholars Hub premium polish layer. */
+:root { --font-display: 'Syne', 'Plus Jakarta Sans', system-ui, sans-serif; --font-body: 'DM Sans', 'Plus Jakarta Sans', system-ui, sans-serif; }
+html { scroll-padding-top: 92px; }
+body { font-family: var(--font-body); }
+h1, h2, h3, .brand { font-family: var(--font-display); }
+.nav-wrap { top: 12px; margin: 0 16px; border: 1px solid var(--border-light); border-radius: 16px; box-shadow: 0 12px 35px rgba(7,21,47,.08); }
+.nav { height: 68px; }
+.brand { letter-spacing: -.035em; }
+.nav-actions > button { min-width: 44px; min-height: 44px; }
+.saved-trigger { position: relative; }
+.saved-trigger.active { color: var(--accent-indigo); background: rgba(99,102,241,.08); }
+.saved-badge { position:absolute; top:1px; right:1px; min-width:18px; height:18px; padding:0 5px; border-radius:999px; display:grid; place-items:center; background:var(--accent-cyan); color:#04101f; font-size:10px; line-height:1; font-weight:800; }
+.hero { min-height: min(760px, calc(100svh - 90px)); }
+.hero-copy { max-width: 640px; }
+.hero h1 { letter-spacing: -.055em; }
+.hero p { max-width: 62ch; }
+.hero-3d-container, .hero-3d-fallback { opacity: .82; }
+.hero-visual { filter: drop-shadow(0 25px 55px rgba(7,21,47,.12)); }
+.search-panel { position: sticky; top: 96px; z-index: 20; }
+.search-box input { min-height: 46px; font-size: 16px; }
+.tabs button, .filter-btn, .filter-panel button { min-height: 44px; }
+.filter-panel { gap: 10px; }
+.cards-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.op-card { min-height: 310px; border-radius: 16px; }
+.op-card:hover { transform: translateY(-3px); }
+.bookmark-btn { min-width:44px; min-height:44px; display:grid; place-items:center; border-radius:10px; }
+.toast { padding-right:44px; }
+.toast-close { position:absolute; right:10px; top:50%; transform:translateY(-50%); min-width:32px; min-height:32px; }
+@media (max-width:900px) { .nav-wrap { margin:0 10px; } .admin-trigger, .search-trigger-btn, .login { display:none; } .hero { min-height:auto; padding-top:80px; padding-bottom:72px; } }
+@media (max-width:680px) { .nav-wrap { top:8px; margin:0 8px; border-radius:14px; } .nav { height:62px; padding-inline:12px; } .brand { font-size:.92rem; } .hero { padding-top:54px; } .hero h1 { font-size:clamp(2.7rem,14vw,4.4rem); } .hero-visual { display:none; } .hero-3d-container { opacity:.42; } .search-panel { top:78px; } .cards-grid { grid-template-columns:1fr; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important; } .hero-3d-container { display:none; } }
+@media (min-width:1280px) { .container { max-width:1200px; } }

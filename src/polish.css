@@ -1,0 +1,11 @@
+/* Production polish layer kept separate so the legacy visual system remains easy to tune. */
+.nav-wrap{position:sticky;top:0;background:color-mix(in srgb,#f8f9fc 82%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:20;border-bottom:1px solid transparent}
+.dark .nav-wrap{background:color-mix(in srgb,#070d1c 84%,transparent)}
+.scroll-anchor,.section{scroll-margin-top:96px}
+.skip-link{position:fixed;left:16px;top:10px;z-index:100;padding:10px 14px;background:var(--navy);color:#fff;border-radius:6px;font-size:12px;transform:translateY(-160%);transition:transform .2s}.skip-link:focus{transform:translateY(0)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.results-meta{margin:-8px 0 18px;color:var(--navy);font:500 10px 'DM Mono';letter-spacing:.2px}.results-meta span{color:#8b95a6;margin-left:5px}.dark .results-meta{color:#e8efff}
+.dark .nav-links{background:#101a2d}.dark .nav-links button{color:#c7d2e7}.footer-links a{cursor:pointer;text-decoration:none;transition:color .2s}.footer-links a:hover{color:var(--blue)}
+button,a,input{min-height:44px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #00bfc0;outline-offset:3px}.bookmark-btn,.icon-btn{min-width:44px;min-height:44px}.bookmark-btn{display:grid;place-items:center}.tabs button{min-height:44px}.filter-btn{align-items:center;justify-content:space-between}.dark .filter-btn{background:#101a2d}.op-card:focus-within,.program-card:focus-within{border-color:var(--blue)}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}.app *, .app *::before, .app *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}.hero-visual *{animation:none!important}.btn:hover,.op-card:hover,.program-card:hover{transform:none}}
+@media(max-width:850px){.nav-wrap{background:color-mix(in srgb,#f8f9fc 94%,transparent)}.dark .nav-wrap{background:color-mix(in srgb,#070d1c 94%,transparent)}.nav-links{z-index:30}.results-meta{margin-top:-5px}}

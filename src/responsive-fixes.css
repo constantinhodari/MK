@@ -1,0 +1,19 @@
+/* Small-screen safeguards for touch scrolling, virtual keyboards, and narrow layouts. */
+@media (max-width: 680px) {
+  .modal-backdrop { align-items: flex-start; padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); }
+  .auth-modal, .opportunity-modal { width: min(100%, 520px); max-height: calc(100dvh - 24px); margin: 0 auto; padding: 26px 20px; border-radius: 14px; }
+  .auth-modal h2, .opportunity-modal h2 { font-size: 26px; padding-right: 22px; }
+  .auth-brand { margin-bottom: 25px; }
+  .auth-form input { font-size: 16px; }
+  .auth-form { padding-bottom: 4px; }
+  .opportunity-summary { margin-top: 18px; }
+}
+
+@media (max-width: 400px) {
+  .hero-ctas { align-items: stretch; flex-direction: column; gap: 12px; }
+  .hero-ctas .btn, .hero-ctas .text-btn { justify-content: center; }
+  .search-panel .search-box { flex-basis: 100%; }
+  .tabs { gap: 8px; overflow-x: auto; justify-content: flex-start; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { flex: 0 0 auto; }
+}

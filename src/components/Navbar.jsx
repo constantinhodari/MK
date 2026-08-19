@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowUpRight, LayoutDashboard, Menu, Moon, Search, Sparkles, Sun, X } from 'lucide-react';
+import { ArrowUpRight, Bookmark, LayoutDashboard, Menu, Moon, Search, Sparkles, Sun, X } from 'lucide-react';
 
 export default function Navbar({
   dark,
@@ -49,9 +49,6 @@ export default function Navbar({
           <button type="button" onClick={() => scrollTo('career')}>
             Smart Matcher
           </button>
-          <button type="button" onClick={() => scrollTo('programs')}>
-            Programs
-          </button>
           <button type="button" onClick={() => scrollTo('services')}>
             Studio
           </button>
@@ -88,6 +85,20 @@ export default function Navbar({
             aria-label={dark ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {dark ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+
+          <button
+            type="button"
+            className="icon-btn saved-trigger"
+            aria-label="Saved opportunities"
+            style={{ position: 'relative' }}
+          >
+            <Bookmark size={18} />
+            {savedCount > 0 && (
+              <span className="saved-badge" style={{ position: 'absolute', top: -6, right: -8, background: 'var(--accent-cyan)', color: '#000', fontSize: '10px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
+                {savedCount}
+              </span>
+            )}
           </button>
 
           <button

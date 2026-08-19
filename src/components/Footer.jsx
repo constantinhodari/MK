@@ -35,7 +35,6 @@ export default function Footer() {
             <button type="button" onClick={() => scrollTo('opportunities')}>Scholarships</button>
             <button type="button" onClick={() => scrollTo('opportunities')}>Remote Jobs</button>
             <button type="button" onClick={() => scrollTo('opportunities')}>Fellowships</button>
-            <button type="button" onClick={() => scrollTo('programs')}>Study Programs</button>
           </div>
           <div>
             <b>Solutions</b>

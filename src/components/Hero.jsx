@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, ArrowUpRight, Bookmark, Check, Compass, GraduationCap, Play, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Bookmark, Check, Compass, GraduationCap, Play, Zap } from 'lucide-react';
 import Hero3DCanvas from './Hero3DCanvas';
 
 export default function Hero({ onExplore, onSelectFeatured }) {

@@ -167,41 +167,6 @@ export const INTERNSHIPS = [
   }
 ];
 
-export const PROGRAMS = [
-  {
-    id: 'prog-1',
-    title: 'MSc Data Science & AI',
-    school: 'University of Edinburgh',
-    country: '🇬🇧 United Kingdom',
-    duration: '1 year full-time',
-    fee: '$29,800',
-    rank: '#22 worldwide',
-    color: '#3B82F6',
-    highlights: ['Machine Learning', 'Computer Vision', 'Ethical AI']
-  },
-  {
-    id: 'prog-2',
-    title: 'Master of Sustainable Design',
-    school: 'Aalto University',
-    country: '🇫🇮 Finland',
-    duration: '2 years full-time',
-    fee: '$16,400',
-    rank: '#3 in Design',
-    color: '#10B981',
-    highlights: ['Circular Economy', 'Material Science', 'Nordic UX']
-  },
-  {
-    id: 'prog-3',
-    title: 'MSc Human-Computer Interaction',
-    school: 'KTH Royal Institute',
-    country: '🇸🇪 Sweden',
-    duration: '2 years full-time',
-    fee: '€18,500',
-    rank: '#10 in Europe',
-    color: '#8B5CF6',
-    highlights: ['Spatial Computing', 'Accessibility Design', 'User Research']
-  }
-];
 
 export const PLATFORM_STATS = [
   { value: '15,000+', label: 'Verified Scholarships', change: '+12% this month' },

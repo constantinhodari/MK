@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { ArrowRight, Bookmark, Check, Clock3, GraduationCap, MapPin, X } from 'lucide-react';
+import { ArrowRight, Bookmark, Check, X } from 'lucide-react';
 
 export default function OpportunityModal({
   opportunity,
@@ -87,11 +87,11 @@ export default function OpportunityModal({
             'This opportunity is curated for ambitious people looking for a meaningful next move. Create a profile to check your fit, save it, and track your application.'}
         </p>
 
-        {opportunity.eligibility && (
+        {(opportunity.eligibility || opportunity.requirements) && (
           <div className="modal-requirements">
-            <b>Key Requirements:</b>
+            <b>{opportunity.eligibility ? 'Eligibility:' : 'Requirements:'}</b>
             <ul>
-              {opportunity.eligibility.map((req, i) => (
+              {(opportunity.eligibility || opportunity.requirements).map((req, i) => (
                 <li key={i}>
                   <Check size={14} className="accent-check" /> {req}
                 </li>

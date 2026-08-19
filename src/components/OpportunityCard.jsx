@@ -1,18 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, Bookmark, BriefcaseBusiness, Clock3, GraduationCap, MapPin, Zap } from 'lucide-react';
+import { ArrowUpRight, Bookmark, Clock3, GraduationCap, MapPin } from 'lucide-react';
 
 export default function OpportunityCard({ item, isSaved, onToggleSave, onSelect, index }) {
-  const isJob = item.category === 'Jobs';
-  const isInternship = item.category === 'Internships';
-
   return (
     <motion.article
       initial={{ opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: (index % 6) * 0.06 }}
-      className={`op-card glass-card ${isJob ? 'job-card' : ''}`}
+      className="op-card glass-card"
     >
       <div className="op-card-head">
         <div
@@ -59,18 +56,6 @@ export default function OpportunityCard({ item, isSaved, onToggleSave, onSelect,
           <span>
             <Clock3 size={13} /> {item.duration}
           </span>
-        )}
-      </div>
-
-      <div className="card-bottom">
-        <div>
-          <small>{isJob ? 'Salary range' : 'Value up to'}</small>
-          <strong>{item.amount || item.salary || item.tag}</strong>
-        </div>
-        {item.deadline && (
-          <div className="deadline">
-            <Clock3 size={13} /> {item.deadline}
-          </div>
         )}
       </div>
 

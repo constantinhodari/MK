@@ -1,35 +1,18 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-  Activity, ArrowUpRight, BarChart3, Bell, BookOpen, BriefcaseBusiness, Check, ChevronRight,
+  ArrowUpRight, BarChart3, Bell, BookOpen, BriefcaseBusiness, Check, ChevronRight,
   CircleDollarSign, FileText, GraduationCap, LayoutDashboard, LogOut, Menu, MoreHorizontal,
   Search, Settings, Sparkles, Users, X
 } from 'lucide-react';
 
-const metrics = [
-  { label: 'Total active users', value: '25,481', change: '+12.8%', icon: Users, tone: 'blue' },
-  { label: 'Listed opportunities', value: '2,846', change: '+8.4%', icon: BriefcaseBusiness, tone: 'cyan' },
-  { label: 'Applications submitted', value: '8,294', change: '+24.6%', icon: FileText, tone: 'purple' },
-  { label: 'Platform revenue', value: '$48,290', change: '+18.2%', icon: CircleDollarSign, tone: 'green' },
-];
-
 const initialRows = [
   { id: '1', title: 'Global Excellence Award', type: 'Scholarship', status: 'Published', views: '12,804', icon: GraduationCap },
   { id: '2', title: 'Senior Product Designer · Airbnb', type: 'Job', status: 'Published', views: '8,291', icon: BriefcaseBusiness },
-  { id: '3', title: 'MSc Data Science & AI', type: 'Study Program', status: 'Review', views: '5,670', icon: BookOpen },
+  { id: '3', title: 'MSc Data Science & AI', type: 'Scholarship', status: 'Review', views: '5,670', icon: GraduationCap },
   { id: '4', title: 'Women in STEM Fellowship', type: 'Scholarship', status: 'Published', views: '4,893', icon: GraduationCap },
 ];
 
-const navItems = [
-  { label: 'Overview', icon: LayoutDashboard },
-  { label: 'Opportunities', icon: BriefcaseBusiness, count: '2,846' },
-  { label: 'Users', icon: Users },
-  { label: 'Applications', icon: FileText },
-  { label: 'Content', icon: BookOpen },
-  { label: 'Analytics', icon: BarChart3 },
-  { label: 'Settings', icon: Settings },
-];
-
-function AdminWorkspace({ section, rows, search, onBack, onAction }) {
+function AdminWorkspace({ section, rows, search, onBack, onAction, onAddOpportunity }) {
   const filteredRows = rows.filter((row) =>
     `${row.title} ${row.type} ${row.status}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -60,7 +43,7 @@ function AdminWorkspace({ section, rows, search, onBack, onAction }) {
             <h3>
               All opportunities <span>{filteredRows.length}</span>
             </h3>
-            <button type="button" className="btn btn-small" onClick={() => onAction('Add opportunity modal opened')}>
+            <button type="button" className="btn btn-small" onClick={onAddOpportunity}>
               Add opportunity +
             </button>
           </div>
@@ -92,7 +75,7 @@ function AdminWorkspace({ section, rows, search, onBack, onAction }) {
             <h3>{section} Overview</h3>
           </div>
           <p className="muted" style={{ padding: '1.5rem' }}>
-            {section} management interface is fully configured and active.
+            This section isn&apos;t built out in this preview yet.
           </p>
         </section>
       )}
@@ -100,19 +83,58 @@ function AdminWorkspace({ section, rows, search, onBack, onAction }) {
   );
 }
 
+// Note: This admin panel is a prototype interface.
+// Real auth and authorization must be implemented once the server/ exists.
+// The current "preview mode" guard is cosmetic only.
 export default function AdminPanel({ onClose, onAction }) {
+  const [previewAccepted, setPreviewAccepted] = useState(false);
   const [activeNav, setActiveNav] = useState('Overview');
   const [search, setSearch] = useState('');
-  const [range, setRange] = useState('Last 30 days');
+  const [range] = useState('Last 30 days');
   const [rows, setRows] = useState(initialRows);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationsCleared, setNotificationsCleared] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [mobileNav, setMobileNav] = useState(false);
 
-  const filteredRows = useMemo(
-    () => rows.filter((row) => `${row.title} ${row.type} ${row.status}`.toLowerCase().includes(search.toLowerCase())),
-    [rows, search]
-  );
+  const notificationRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
+
+  const reviewCount = rows.filter((r) => r.status === 'Review').length;
+  const hasUnread = !notificationsCleared && reviewCount > 0;
+
+  const dynamicMetrics = [
+    { label: 'Total active users', value: '25,481', change: '+12.8%', icon: Users, tone: 'blue' },
+    { label: 'Listed opportunities', value: rows.length.toLocaleString(), change: '+8.4%', icon: BriefcaseBusiness, tone: 'cyan' },
+    { label: 'Applications submitted', value: '8,294', change: '+24.6%', icon: FileText, tone: 'purple' },
+    { label: 'Platform revenue', value: '$48,290', change: '+18.2%', icon: CircleDollarSign, tone: 'green' },
+  ];
+
+  const dynamicNavItems = [
+    { label: 'Overview', icon: LayoutDashboard },
+    { label: 'Opportunities', icon: BriefcaseBusiness, count: rows.length.toLocaleString() },
+    { label: 'Users', icon: Users },
+    { label: 'Applications', icon: FileText },
+    { label: 'Content', icon: BookOpen },
+    { label: 'Analytics', icon: BarChart3 },
+    { label: 'Settings', icon: Settings },
+  ];
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   const selectNav = (label) => {
     setActiveNav(label);
@@ -129,10 +151,10 @@ export default function AdminPanel({ onClose, onAction }) {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'opportuna-metrics-export.csv';
+    anchor.download = 'opportuna-opportunities-export.csv';
     anchor.click();
     URL.revokeObjectURL(url);
-    onAction('CSV Report exported successfully');
+    onAction('Opportunities list exported');
   };
 
   const addOpportunity = (e) => {
@@ -147,13 +169,31 @@ export default function AdminPanel({ onClose, onAction }) {
         type,
         status: 'Review',
         views: '0',
-        icon: type === 'Job' ? BriefcaseBusiness : type === 'Study Program' ? BookOpen : GraduationCap
+        icon: type === 'Job' ? BriefcaseBusiness : type === 'Internship' ? Sparkles : GraduationCap
       },
       ...prev
     ]);
+    setNotificationsCleared(false);
     setShowAdd(false);
     onAction(`Opportunity "${title}" created for review`);
   };
+
+  if (!previewAccepted) {
+    return (
+      <div className="admin-overlay" role="dialog" aria-modal="true" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', textAlign: 'center' }}>
+          <h2>Admin Preview Mode</h2>
+          <p style={{ margin: '1rem 0', opacity: 0.8 }}>
+            This is an unauthenticated preview of the admin dashboard. No backend is connected.
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+            <button type="button" className="admin-secondary" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn btn-small" onClick={() => setPreviewAccepted(true)}>Enter preview mode</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="admin-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-title">
@@ -184,7 +224,7 @@ export default function AdminPanel({ onClose, onAction }) {
         </div>
 
         <nav className="admin-nav" aria-label="Admin navigation">
-          {navItems.map(({ label, icon: Icon, count }) => (
+          {dynamicNavItems.map(({ label, icon: Icon, count }) => (
             <button
               key={label}
               className={activeNav === label ? 'active' : ''}
@@ -199,7 +239,7 @@ export default function AdminPanel({ onClose, onAction }) {
         </nav>
 
         <div className="admin-sidebar-bottom">
-          <button type="button" onClick={() => onAction('Signed out of admin mode')}>
+          <button type="button" onClick={() => { onAction('Signed out of admin mode'); onClose(); }}>
             <LogOut size={17} /> Sign out
           </button>
         </div>
@@ -216,35 +256,37 @@ export default function AdminPanel({ onClose, onAction }) {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search admin records..."
+              disabled={activeNav !== 'Opportunities'}
+              placeholder={activeNav === 'Opportunities' ? "Search admin records..." : "Search applies to Opportunities tab"}
               aria-label="Search admin records"
             />
           </div>
 
           <div className="admin-top-actions">
-            <div className="notification-wrap">
+            <div className="notification-wrap" ref={notificationRef}>
               <button
                 type="button"
                 onClick={() => setShowNotifications(!showNotifications)}
                 aria-label="Notifications"
               >
                 <Bell size={18} />
-                <i className="badge-dot" />
+                {hasUnread && <i className="badge-dot" />}
               </button>
 
               {showNotifications && (
                 <div className="notification-popover glass-panel">
                   <b>System Notifications</b>
                   <p>
-                    <Check size={14} className="accent-check" /> 3 opportunities need review
+                    <Check size={14} className="accent-check" /> {reviewCount} opportunities need review
                   </p>
                   <p>
-                    <Users size={14} /> 128 new scholars joined today
+                    <Users size={14} /> 128 new scholars joined today (Sample)
                   </p>
                   <button
                     type="button"
                     onClick={() => {
                       setShowNotifications(false);
+                      setNotificationsCleared(true);
                       onAction('All notifications cleared');
                     }}
                   >
@@ -269,10 +311,10 @@ export default function AdminPanel({ onClose, onAction }) {
           <div className="admin-heading">
             <div>
               <span className="kicker">ADMIN DASHBOARD</span>
-              <h1 id="admin-title">Good morning, Alex.</h1>
+              <h1 id="admin-title">{greeting}, Alex.</h1>
               <p>
                 {activeNav === 'Overview'
-                  ? 'Here is real-time performance across your platform today.'
+                  ? 'Here is sample performance data across your platform today.'
                   : `${activeNav} workspace controls.`}
               </p>
             </div>
@@ -287,7 +329,7 @@ export default function AdminPanel({ onClose, onAction }) {
           </div>
 
           <div className="admin-metrics">
-            {metrics.map(({ label, value, change, icon: Icon, tone }) => (
+            {dynamicMetrics.map(({ label, value, change, icon: Icon, tone }) => (
               <div className="admin-metric glass-card" key={label}>
                 <div className={`metric-icon ${tone}`}>
                   <Icon size={18} />
@@ -344,8 +386,8 @@ export default function AdminPanel({ onClose, onAction }) {
               <section className="admin-card activity-card glass-panel">
                 <div className="admin-card-heading">
                   <div>
-                    <span className="kicker">LIVE FEED</span>
-                    <h2>Recent Activity</h2>
+                    <span className="kicker">SAMPLE DATA</span>
+                    <h2>Recent Activity (Preview)</h2>
                   </div>
                   <MoreHorizontal size={18} />
                 </div>
@@ -380,6 +422,7 @@ export default function AdminPanel({ onClose, onAction }) {
               search={search}
               onBack={() => setActiveNav('Overview')}
               onAction={onAction}
+              onAddOpportunity={() => setShowAdd(true)}
             />
           )}
         </main>
@@ -415,7 +458,6 @@ export default function AdminPanel({ onClose, onAction }) {
               <option>Scholarship</option>
               <option>Job</option>
               <option>Internship</option>
-              <option>Study Program</option>
             </select>
 
             <div className="admin-form-actions">

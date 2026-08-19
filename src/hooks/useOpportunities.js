@@ -44,10 +44,24 @@ export function useOpportunities() {
     if (activeFilterTag) {
       const tagLower = activeFilterTag.toLowerCase();
       list = list.filter(
-        (item) =>
-          (item.type && item.type.toLowerCase().includes(tagLower)) ||
-          (item.tag && item.tag.toLowerCase().includes(tagLower)) ||
-          (item.deadline && item.deadline.toLowerCase().includes(tagLower))
+        (item) => {
+          if (activeFilterTag === 'Closing soon') {
+            if (item.deadline) {
+              const daysMatch = item.deadline.match(/(\d+)/);
+              if (daysMatch && parseInt(daysMatch[1], 10) <= 21) {
+                return true;
+              }
+            }
+            return false;
+          }
+          return (
+            (item.type && item.type.toLowerCase().includes(tagLower)) ||
+            (item.tag && item.tag.toLowerCase().includes(tagLower)) ||
+            (item.location && item.location.toLowerCase().includes(tagLower)) ||
+            (item.level && item.level.toLowerCase().includes(tagLower)) ||
+            (item.deadline && item.deadline.toLowerCase().includes(tagLower))
+          );
+        }
       );
     }
 

@@ -11,7 +11,6 @@ import Stats from './components/Stats';
 import OpportunitiesSection from './components/OpportunitiesSection';
 import OpportunityModal from './components/OpportunityModal';
 import CareerSection from './components/CareerSection';
-import ProgramsSection from './components/ProgramsSection';
 import ServicesSection from './components/ServicesSection';
 import AboutSection from './components/AboutSection';
 import NewsletterSection from './components/NewsletterSection';
@@ -120,8 +119,6 @@ function App() {
             document.getElementById('services')?.scrollIntoView({ behavior: 'smooth' });
           }}
         />
-
-        <ProgramsSection onShowToast={showToast} />
 
         <ServicesSection
           onContactStudio={() => {

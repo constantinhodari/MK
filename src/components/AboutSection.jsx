@@ -8,7 +8,7 @@ export default function AboutSection() {
         <h2>
           Opportunity is everywhere.
           <br />
-          <em>Access shouldn't be rare.</em>
+          <em>Access shouldn&apos;t be rare.</em>
         </h2>
         <p>
           We’re building the bridge between potential and global possibility — one person, one scholarship, one opportunity at a time.

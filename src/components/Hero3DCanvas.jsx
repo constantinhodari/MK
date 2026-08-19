@@ -21,17 +21,17 @@ import * as THREE from 'three';
 
 export default function Hero3DCanvas() {
   const containerRef = useRef(null);
-  const [webGLSupported, setWebGLSupported] = useState(true);
-
-  useEffect(() => {
-    // ─── WebGL Detection ───────────────────────────────────────
+  const [webGLSupported] = useState(() => {
     try {
       const c = document.createElement('canvas');
-      if (!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')))) {
-        setWebGLSupported(false);
-        return;
-      }
-    } catch { setWebGLSupported(false); return; }
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (!webGLSupported) return;
 
     const container = containerRef.current;
     if (!container) return;
@@ -616,7 +616,6 @@ export default function Hero3DCanvas() {
     const neuralGroup = new THREE.Group();
     const nodeCount = isMobile ? 14 : 28;
     const nodePositions = [];
-    const nodeMat = basicMat({ color: 0x8b5cf6 });
     const nodeGeom = new THREE.SphereGeometry(0.2, 8, 8);
 
     for (let i = 0; i < nodeCount; i++) {
@@ -807,7 +806,7 @@ export default function Hero3DCanvas() {
       });
 
       // Holographic cards hover & tilt toward mouse
-      glassCards.forEach((c, i) => {
+      glassCards.forEach((c) => {
         const { floatOffset, floatSpeed, baseRY } = c.userData;
         c.position.y += Math.sin(t * floatSpeed * S + floatOffset) * 0.003;
         c.rotation.y = baseRY + smoothX * 0.12;
@@ -861,7 +860,7 @@ export default function Hero3DCanvas() {
       });
       renderer.dispose();
     };
-  }, []);
+  }, [webGLSupported]);
 
   if (!webGLSupported) {
     return (

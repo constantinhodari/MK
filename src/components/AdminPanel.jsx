@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   ArrowUpRight, BarChart3, Bell, BookOpen, BriefcaseBusiness, Check, ChevronRight,
   CircleDollarSign, FileText, GraduationCap, LayoutDashboard, LogOut, Menu, MoreHorizontal,
-  Search, Settings, Sparkles, Users, X
+  Search, Settings, Sparkles, Trash2, Users, X
 } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 const initialRows = [
   { id: '1', title: 'Global Excellence Award', type: 'Scholarship', status: 'Published', views: '12,804', icon: GraduationCap },
@@ -12,7 +13,7 @@ const initialRows = [
   { id: '4', title: 'Women in STEM Fellowship', type: 'Scholarship', status: 'Published', views: '4,893', icon: GraduationCap },
 ];
 
-function AdminWorkspace({ section, rows, search, onBack, onAction, onAddOpportunity }) {
+function AdminWorkspace({ section, rows, search, onBack, onAction, onEdit, onDelete }) {
   const filteredRows = rows.filter((row) =>
     `${row.title} ${row.type} ${row.status}`.toLowerCase().includes(search.toLowerCase())
   );
@@ -43,9 +44,6 @@ function AdminWorkspace({ section, rows, search, onBack, onAction, onAddOpportun
             <h3>
               All opportunities <span>{filteredRows.length}</span>
             </h3>
-            <button type="button" className="btn btn-small" onClick={onAddOpportunity}>
-              Add opportunity +
-            </button>
           </div>
           <div className="module-list">
             {filteredRows.map((row) => (
@@ -60,9 +58,14 @@ function AdminWorkspace({ section, rows, search, onBack, onAction, onAddOpportun
                   </small>
                 </div>
                 <span className={`status ${row.status.toLowerCase()}`}>{row.status}</span>
-                <button type="button" className="module-action" onClick={() => onAction(`Editing ${row.title}`)}>
-                  Edit <ArrowUpRight size={14} />
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <button type="button" className="module-action" onClick={() => onEdit(row)}>
+                    Edit <ArrowUpRight size={14} />
+                  </button>
+                  <button type="button" className="module-action" onClick={() => onDelete(row)} title="Delete" aria-label="Delete">
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
@@ -95,9 +98,15 @@ export default function AdminPanel({ onClose, onAction }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationsCleared, setNotificationsCleared] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
+  const [editingRow, setEditingRow] = useState(null);
   const [mobileNav, setMobileNav] = useState(false);
 
   const notificationRef = useRef(null);
+  const previewRef = useRef(null);
+  const adminRef = useRef(null);
+
+  useFocusTrap(previewRef, !previewAccepted, onClose);
+  useFocusTrap(adminRef, previewAccepted, onClose);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -157,30 +166,50 @@ export default function AdminPanel({ onClose, onAction }) {
     onAction('Opportunities list exported');
   };
 
+  const handleEdit = (row) => {
+    setEditingRow(row);
+    setShowAdd(true);
+  };
+
+  const handleDelete = (row) => {
+    if (window.confirm(`Are you sure you want to delete "${row.title}"?`)) {
+      setRows((prev) => prev.filter((r) => r.id !== row.id));
+      onAction(`Opportunity "${row.title}" deleted`);
+    }
+  };
+
   const addOpportunity = (e) => {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
     const title = form.get('title');
     const type = form.get('type');
-    setRows((prev) => [
-      {
-        id: String(Date.now()),
-        title,
-        type,
-        status: 'Review',
-        views: '0',
-        icon: type === 'Job' ? BriefcaseBusiness : type === 'Internship' ? Sparkles : GraduationCap
-      },
-      ...prev
-    ]);
-    setNotificationsCleared(false);
-    setShowAdd(false);
-    onAction(`Opportunity "${title}" created for review`);
+    
+    if (editingRow) {
+      setRows((prev) => prev.map(r => r.id === editingRow.id ? { ...r, title, type, icon: type === 'Job' ? BriefcaseBusiness : type === 'Internship' ? Sparkles : GraduationCap } : r));
+      setShowAdd(false);
+      setEditingRow(null);
+      onAction(`Opportunity "${title}" updated`);
+    } else {
+      setRows((prev) => [
+        {
+          id: String(Date.now()),
+          title,
+          type,
+          status: 'Review',
+          views: '0',
+          icon: type === 'Job' ? BriefcaseBusiness : type === 'Internship' ? Sparkles : GraduationCap
+        },
+        ...prev
+      ]);
+      setNotificationsCleared(false);
+      setShowAdd(false);
+      onAction(`Opportunity "${title}" created for review`);
+    }
   };
 
   if (!previewAccepted) {
     return (
-      <div className="admin-overlay" role="dialog" aria-modal="true" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div ref={previewRef} className="admin-overlay" role="dialog" aria-modal="true" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div className="glass-panel" style={{ padding: '2rem', maxWidth: '400px', textAlign: 'center' }}>
           <h2>Admin Preview Mode</h2>
           <p style={{ margin: '1rem 0', opacity: 0.8 }}>
@@ -196,7 +225,7 @@ export default function AdminPanel({ onClose, onAction }) {
   }
 
   return (
-    <div className="admin-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+    <div ref={adminRef} className="admin-overlay" role="dialog" aria-modal="true" aria-labelledby="admin-title">
       <aside className={`admin-sidebar glass-panel ${mobileNav ? 'mobile-open' : ''}`}>
         <div className="admin-logo">
           <span className="brand-mark">
@@ -251,13 +280,12 @@ export default function AdminPanel({ onClose, onAction }) {
             <Menu size={20} /> Navigation
           </button>
 
-          <div className="admin-search">
+          <div className="admin-search" style={{ visibility: activeNav === 'Opportunities' ? 'visible' : 'hidden' }}>
             <Search size={16} />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              disabled={activeNav !== 'Opportunities'}
-              placeholder={activeNav === 'Opportunities' ? "Search admin records..." : "Search applies to Opportunities tab"}
+              placeholder="Search admin records..."
               aria-label="Search admin records"
             />
           </div>
@@ -322,9 +350,11 @@ export default function AdminPanel({ onClose, onAction }) {
               <button type="button" className="admin-secondary" onClick={exportReport}>
                 Export report <ArrowUpRight size={15} />
               </button>
-              <button type="button" className="btn btn-small" onClick={() => setShowAdd(true)}>
-                Add opportunity +
-              </button>
+              {activeNav === 'Opportunities' && (
+                <button type="button" className="btn btn-small" onClick={() => setShowAdd(true)}>
+                  Add opportunity +
+                </button>
+              )}
             </div>
           </div>
 
@@ -389,7 +419,9 @@ export default function AdminPanel({ onClose, onAction }) {
                     <span className="kicker">SAMPLE DATA</span>
                     <h2>Recent Activity (Preview)</h2>
                   </div>
-                  <MoreHorizontal size={18} />
+                  <button type="button" className="module-action" style={{ padding: '0.4rem' }} onClick={() => onAction('Activity menu clicked (not implemented)')} aria-label="Activity menu">
+                    <MoreHorizontal size={18} />
+                  </button>
                 </div>
                 <div className="activity-list">
                   <div>
@@ -422,7 +454,8 @@ export default function AdminPanel({ onClose, onAction }) {
               search={search}
               onBack={() => setActiveNav('Overview')}
               onAction={onAction}
-              onAddOpportunity={() => setShowAdd(true)}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           )}
         </main>
@@ -431,41 +464,47 @@ export default function AdminPanel({ onClose, onAction }) {
       {showAdd && (
         <div
           className="admin-form-backdrop glass-backdrop"
-          onMouseDown={(e) => e.target === e.currentTarget && setShowAdd(false)}
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowAdd(false);
+              setEditingRow(null);
+            }
+          }}
         >
-          <form className="admin-add-form glass-panel" onSubmit={addOpportunity}>
+          <form className="admin-add-form glass-panel" onSubmit={addOpportunity} key={editingRow?.id || 'new'}>
             <button
               type="button"
               className="modal-close"
-              onClick={() => setShowAdd(false)}
-              aria-label="Close add form"
+              onClick={() => { setShowAdd(false); setEditingRow(null); }}
+              aria-label="Close form"
             >
               <X size={18} />
             </button>
             <span className="kicker">CONTENT MANAGEMENT</span>
-            <h2>Add New Opportunity</h2>
+            <h2>{editingRow ? 'Edit Opportunity' : 'Add New Opportunity'}</h2>
 
             <label htmlFor="admin-title-input">Opportunity Title</label>
             <input
               id="admin-title-input"
               name="title"
               required
+              defaultValue={editingRow?.title || ''}
               placeholder="e.g. ETH Excellence Fellowship"
             />
 
             <label htmlFor="admin-type-input">Category</label>
-            <select id="admin-type-input" name="type" defaultValue="Scholarship">
+            <select id="admin-type-input" name="type" defaultValue={editingRow?.type || 'Scholarship'}>
               <option>Scholarship</option>
               <option>Job</option>
               <option>Internship</option>
             </select>
 
             <div className="admin-form-actions">
-              <button type="button" className="admin-secondary" onClick={() => setShowAdd(false)}>
+              <button type="button" className="admin-secondary" onClick={() => { setShowAdd(false); setEditingRow(null); }}>
                 Cancel
               </button>
               <button type="submit" className="btn btn-small">
-                <span>Save for Review</span>
+                <span>{editingRow ? 'Save Changes' : 'Save for Review'}</span>
                 <Check size={15} />
               </button>
             </div>

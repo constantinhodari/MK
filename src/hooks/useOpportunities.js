@@ -8,9 +8,9 @@ export function useOpportunities() {
   const [savedIds, setSavedIds] = useState(() => {
     try {
       const stored = window.localStorage.getItem('opportuna-saved-items');
-      return stored ? JSON.parse(stored) : ['sch-1', 'job-1'];
+      return stored ? JSON.parse(stored) : [];
     } catch {
-      return ['sch-1', 'job-1'];
+      return [];
     }
   });
 

@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowRight, Check, Eye, EyeOff, Sparkles, X } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export default function AuthModal({ mode, onClose, onSuccess }) {
   const [currentMode, setCurrentMode] = useState(mode || 'register');
@@ -12,24 +13,8 @@ export default function AuthModal({ mode, onClose, onSuccess }) {
 
   const isRegister = currentMode === 'register';
 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    const timer = setTimeout(() => {
-      const closeBtn = modalRef.current?.querySelector('.modal-close');
-      closeBtn?.focus();
-    }, 50);
-
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(timer);
-    };
-  }, [onClose]);
+  // Apply WCAG 2.1 AA focus trapping & body scroll lock
+  useFocusTrap(modalRef, true, onClose);
 
   // Password strength calculator
   const getPasswordStrength = (pwd) => {

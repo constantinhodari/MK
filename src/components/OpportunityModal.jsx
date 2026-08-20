@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { ArrowRight, Bookmark, Check, X } from 'lucide-react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 export default function OpportunityModal({
   opportunity,
@@ -10,32 +11,8 @@ export default function OpportunityModal({
 }) {
   const modalRef = useRef(null);
 
-  useEffect(() => {
-    if (!opportunity) return;
-
-    // Lock body scroll
-    document.body.style.overflow = 'hidden';
-
-    // Focus close button on mount
-    const timer = setTimeout(() => {
-      const closeBtn = modalRef.current?.querySelector('.modal-close');
-      closeBtn?.focus();
-    }, 50);
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-      clearTimeout(timer);
-    };
-  }, [opportunity, onClose]);
+  // Apply WCAG 2.1 AA focus trapping & body scroll lock
+  useFocusTrap(modalRef, Boolean(opportunity), onClose);
 
   if (!opportunity) return null;
 

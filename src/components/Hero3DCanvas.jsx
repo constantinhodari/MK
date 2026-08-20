@@ -170,15 +170,15 @@ export default function Hero3DCanvas() {
     // ─── City Hub Markers ──────────────────────────────────────
     const HUB_DATA = [
       { lat: 40.71, lng: -74.01, label: 'New York', color: 0x38bdf8 },
-      { lat: 51.51, lng: -0.13,  label: 'London',   color: 0xa78bfa },
-      { lat: 48.86, lng: 2.35,   label: 'Paris',    color: 0xfbbf24 },
-      { lat: 35.68, lng: 139.65, label: 'Tokyo',    color: 0x34d399 },
-      { lat: -33.87, lng: 151.21,label: 'Sydney',   color: 0xf472b6 },
-      { lat: -1.29,  lng: 36.82, label: 'Nairobi',  color: 0x4ade80 },
-      { lat: 19.08,  lng: 72.88, label: 'Mumbai',   color: 0xfb923c },
-      { lat: -23.55, lng: -46.63,label: 'São Paulo',color: 0x60a5fa },
-      { lat: 52.52,  lng: 13.40, label: 'Berlin',   color: 0xe879f9 },
-      { lat: 1.35,   lng: 103.82,label: 'Singapore',color: 0x06b6d4 },
+      { lat: 51.51, lng: -0.13, label: 'London', color: 0xa78bfa },
+      { lat: 48.86, lng: 2.35, label: 'Paris', color: 0xfbbf24 },
+      { lat: 35.68, lng: 139.65, label: 'Tokyo', color: 0x34d399 },
+      { lat: -33.87, lng: 151.21, label: 'Sydney', color: 0xf472b6 },
+      { lat: -1.29, lng: 36.82, label: 'Nairobi', color: 0x4ade80 },
+      { lat: 19.08, lng: 72.88, label: 'Mumbai', color: 0xfb923c },
+      { lat: -23.55, lng: -46.63, label: 'São Paulo', color: 0x60a5fa },
+      { lat: 52.52, lng: 13.40, label: 'Berlin', color: 0xe879f9 },
+      { lat: 1.35, lng: 103.82, label: 'Singapore', color: 0x06b6d4 },
     ];
 
     const latLngToVec = (lat, lng, r) => {
@@ -256,13 +256,13 @@ export default function Hero3DCanvas() {
     };
 
     // Eiffel-ish tower
-    lmGroup.add(stackBoxes([[1.6,0.4,1.6,0],[1.1,0.4,1.1,0.5],[0.7,0.5,0.7,1.2],[0.3,2.5,0.3,2.7],[0.1,1.5,0.1,5]], -18, GLOBE_R + 0.1, -14));
+    lmGroup.add(stackBoxes([[1.6, 0.4, 1.6, 0], [1.1, 0.4, 1.1, 0.5], [0.7, 0.5, 0.7, 1.2], [0.3, 2.5, 0.3, 2.7], [0.1, 1.5, 0.1, 5]], -18, GLOBE_R + 0.1, -14));
 
     // Big Ben pillar
-    lmGroup.add(stackBoxes([[1.2,5,1.2,2.5],[1.5,0.5,1.5,0],[1.1,0.6,1.1,5.3]], -26, GLOBE_R + 0.1, -10));
+    lmGroup.add(stackBoxes([[1.2, 5, 1.2, 2.5], [1.5, 0.5, 1.5, 0], [1.1, 0.6, 1.1, 5.3]], -26, GLOBE_R + 0.1, -10));
 
     // Tall skyscraper (Burj-ish)
-    lmGroup.add(stackBoxes([[1.3,8,1.3,4],[0.9,5,0.9,9.5],[0.4,4,0.4,14],[0.1,3,0.1,17.5]], 18, GLOBE_R + 0.1, -10));
+    lmGroup.add(stackBoxes([[1.3, 8, 1.3, 4], [0.9, 5, 0.9, 9.5], [0.4, 4, 0.4, 14], [0.1, 3, 0.1, 17.5]], 18, GLOBE_R + 0.1, -10));
 
     // Sydney-ish Opera shells
     {
@@ -278,7 +278,7 @@ export default function Hero3DCanvas() {
     }
 
     // CN Tower obelisk
-    lmGroup.add(stackBoxes([[0.8,9,0.8,4.5],[0.4,4,0.4,10],[0.15,3,0.15,13.5],[0.8,0.4,0.8,15]], 4, GLOBE_R + 0.1, -20));
+    lmGroup.add(stackBoxes([[0.8, 9, 0.8, 4.5], [0.4, 4, 0.4, 10], [0.15, 3, 0.15, 13.5], [0.8, 0.4, 0.8, 15]], 4, GLOBE_R + 0.1, -20));
 
     globeGroup.add(lmGroup);
 
@@ -523,10 +523,10 @@ export default function Hero3DCanvas() {
     // ═══════════════════════════════════════════════════════════
     const glassCards = [];
     const glassCardDefs = [
-      { pos: [-16, 5, -4], rx: 0,   ry: 0.4,  col: 0x6366f1 },
-      { pos: [17,  4, -2], rx: 0,   ry: -0.4, col: 0x38bdf8 },
-      { pos: [-14, -3, 3], rx: 0.2, ry: 0.3,  col: 0x8b5cf6 },
-      { pos: [15, -4, 3],  rx: 0.1, ry: -0.3, col: 0x10b981 },
+      { pos: [-16, 5, -4], rx: 0, ry: 0.4, col: 0x6366f1 },
+      { pos: [17, 4, -2], rx: 0, ry: -0.4, col: 0x38bdf8 },
+      { pos: [-14, -3, 3], rx: 0.2, ry: 0.3, col: 0x8b5cf6 },
+      { pos: [15, -4, 3], rx: 0.1, ry: -0.3, col: 0x10b981 },
     ];
 
     const cardGeom = new THREE.PlaneGeometry(4.5, 2.8);

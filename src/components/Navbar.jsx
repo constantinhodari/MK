@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Bookmark, LayoutDashboard, Menu, Moon, Search, Sparkles, Sun, X } from 'lucide-react';
 
 export default function Navbar({
@@ -7,9 +7,35 @@ export default function Navbar({
   onOpenAuth,
   onOpenAdmin,
   onTriggerSearch,
-  savedCount
+  savedCount,
+  onViewSaved
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileNavRef = useRef(null);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileOpen]);
+
+  // Close mobile menu on Escape key
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const handleKey = (e) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [mobileOpen]);
 
   const scrollTo = (id) => {
     setMobileOpen(false);
@@ -38,13 +64,12 @@ export default function Navbar({
 
         <div
           id="primary-navigation"
+          ref={mobileNavRef}
           className={`nav-links ${mobileOpen ? 'open' : ''}`}
+          role="navigation"
         >
           <button type="button" onClick={() => scrollTo('opportunities')}>
-            Scholarships
-          </button>
-          <button type="button" onClick={() => scrollTo('opportunities')}>
-            Jobs & Internships
+            Opportunities
           </button>
           <button type="button" onClick={() => scrollTo('career')}>
             Smart Matcher
@@ -72,7 +97,7 @@ export default function Navbar({
             type="button"
             className="admin-trigger"
             onClick={onOpenAdmin}
-            aria-label="Open admin workspace dashboard"
+            aria-label="Open admin workspace dashboard (demo)"
           >
             <LayoutDashboard size={15} />
             <span>Admin</span>
@@ -90,12 +115,23 @@ export default function Navbar({
           <button
             type="button"
             className="icon-btn saved-trigger"
-            aria-label="Saved opportunities"
+            onClick={onViewSaved}
+            aria-label={`Saved opportunities${savedCount > 0 ? ` (${savedCount})` : ''}`}
             style={{ position: 'relative' }}
           >
             <Bookmark size={18} />
             {savedCount > 0 && (
-              <span className="saved-badge" style={{ position: 'absolute', top: -6, right: -8, background: 'var(--accent-cyan)', color: '#000', fontSize: '10px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px' }}>
+              <span
+                className="saved-badge"
+                aria-hidden="true"
+                style={{
+                  position: 'absolute', top: -6, right: -8,
+                  background: 'var(--accent-cyan, #00cfd0)', color: '#000',
+                  fontSize: '10px', fontWeight: 'bold',
+                  padding: '2px 6px', borderRadius: '10px',
+                  lineHeight: 1.2,
+                }}
+              >
                 {savedCount}
               </span>
             )}

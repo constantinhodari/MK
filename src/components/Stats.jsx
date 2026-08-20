@@ -16,13 +16,12 @@ function useCountUp(value, trigger) {
     if (!trigger) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     
-    const numericStr = value.replace(/[^0-9.]/g, '');
-    const num = parseFloat(numericStr);
+    const match = value.match(/^(\D*)([\d,]+)(\D*)$/);
+    if (!match) return;
     
+    const [, prefix, digits, suffix] = match;
+    const num = parseFloat(digits.replace(/,/g, ''));
     if (isNaN(num)) return;
-    
-    const prefix = value.substring(0, value.indexOf(numericStr[0])) || '';
-    const suffix = value.substring(value.indexOf(numericStr[numericStr.length - 1]) + 1) || '';
     
     let startTime;
     const duration = 1500;

@@ -63,6 +63,7 @@ export default function OpportunityCard({ item, isSaved, onToggleSave, onSelect,
         type="button"
         className="full-link"
         onClick={() => onSelect(item)}
+        aria-label={`View details for ${item.name}`}
       >
         <span>View opportunity</span>
         <ArrowUpRight size={15} />

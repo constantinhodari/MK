@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useCallback, useState } from 'react';
+import React, { lazy, Suspense, useCallback, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Check } from 'lucide-react';
 import { useOpportunities } from './hooks/useOpportunities';
@@ -33,17 +33,21 @@ function App() {
     setActiveFilterTag,
     savedIds,
     toggleSave,
-    filteredItems
+    filteredItems,
+    savedCount
   } = useOpportunities();
 
   const [authMode, setAuthMode] = useState(null); // 'login' | 'register' | null
   const [adminOpen, setAdminOpen] = useState(false);
   const [selectedOpportunity, setSelectedOpportunity] = useState(null);
   const [toastMessage, setToastMessage] = useState('');
+  const toastTimerRef = useRef(null);
 
   const showToast = useCallback((msg) => {
+    // Clear any existing timer to avoid stale updates
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(''), 3200);
+    toastTimerRef.current = setTimeout(() => setToastMessage(''), 3200);
   }, []);
 
   const triggerSearchFocus = useCallback(() => {
@@ -54,27 +58,25 @@ function App() {
     }
   }, []);
 
-  const closeModal = useCallback(() => {
-    setSelectedOpportunity(null);
-    setAuthMode(null);
-    setAdminOpen(false);
-  }, []);
-
-  // Keyboard Hotkeys (Cmd+K to search, Esc to close modals)
+  // Keyboard Hotkeys (Cmd+K to search)
   useKeyboardShortcut({
-    onCmdK: triggerSearchFocus,
-    onEscape: closeModal
+    onCmdK: triggerSearchFocus
   });
 
   const handleExploreClick = () => {
     document.getElementById('opportunities')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleViewSaved = useCallback(() => {
+    setActiveTab('Saved');
+    document.getElementById('opportunities')?.scrollIntoView({ behavior: 'smooth' });
+  }, [setActiveTab]);
+
   return (
     <div className={`app ${dark ? 'dark' : ''}`}>
       {/* Ambient background glows */}
-      <div className="ambient ambient-one" />
-      <div className="ambient ambient-two" />
+      <div className="ambient ambient-one" aria-hidden="true" />
+      <div className="ambient ambient-two" aria-hidden="true" />
 
       {/* Accessibility Skip Link */}
       <a className="skip-link" href="#main-content">
@@ -88,7 +90,8 @@ function App() {
         onOpenAuth={(mode) => setAuthMode(mode)}
         onOpenAdmin={() => setAdminOpen(true)}
         onTriggerSearch={triggerSearchFocus}
-        savedCount={savedIds.length}
+        savedCount={savedCount}
+        onViewSaved={handleViewSaved}
       />
 
       {/* Main Content Area */}
@@ -159,7 +162,7 @@ function App() {
 
       {/* Lazy Loaded Admin Panel */}
       {adminOpen && (
-        <Suspense fallback={<div className="toast">Loading Admin Workspace...</div>}>
+        <Suspense fallback={<div className="toast" role="status">Loading Admin Workspace...</div>}>
           <AdminPanel
             onClose={() => setAdminOpen(false)}
             onAction={showToast}
